@@ -1,8 +1,8 @@
 {
     "type": "module",
-    "name": "@metrom-xyz/contracts-solana",
+    "name": "@metrom-xyz/programs-solana",
     "version": "0.1.0",
-    "description": "Smart contracts for Metrom.",
+    "description": "Smart programs for Metrom.",
     "author": "Federico Luzzi <federico.luzzi@metrom.xyz>",
     "license": "GPL-3.0-or-later",
     "main": "./dist/index.js",

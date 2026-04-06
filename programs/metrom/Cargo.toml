@@ -3,12 +3,12 @@ cargo-features = ["edition2024"]
 [package]
 name = "metrom"
 version = "0.1.0"
-description = "Solana smart contracts for Metrom"
+description = "Solana programs for Metrom"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "metrom_contracts_solana"
+name = "metrom"
 
 [features]
 default = []

@@ -26,7 +26,7 @@ function getJsonAsTypescript(json) {
 
 const CURRENT_DIR = dirname(fileURLToPath(import.meta.url));
 
-console.log("Building contracts...");
+console.log("Building programs...");
 execSync("anchor build", { stdio: "inherit" });
 
 const idl = JSON.parse(

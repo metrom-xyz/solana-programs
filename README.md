@@ -14,9 +14,9 @@
 
 <p align="center">
     <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3">
-    <img src="https://github.com/metrom-xyz/contracts/actions/workflows/ci.yml/badge.svg" alt="CI">
+    <img src="https://github.com/metrom-xyz/solana-programs/actions/workflows/ci.yaml/badge.svg" alt="CI">
 </p>
 
-# Metrom contracts
+# Metrom programs
 
-The program powering Metrom's efficient AMM incentivization on Solana.
+The programs powering Metrom's efficient AMM incentivization on Solana.
