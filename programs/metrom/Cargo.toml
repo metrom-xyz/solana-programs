@@ -1,14 +1,12 @@
-cargo-features = ["edition2024"]
-
 [package]
-name = "metrom"
+name = "metrom-solana"
 version = "0.1.0"
 description = "Solana programs for Metrom"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "metrom"
+name = "metrom-solana"
 
 [features]
 default = []
