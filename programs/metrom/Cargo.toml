@@ -1,12 +1,12 @@
 [package]
-name = "metrom_solana"
+name = "metrom"
 version = "0.1.0"
 description = "Solana programs for Metrom"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "metrom_solana_client"
+name = "metrom"
 
 [features]
 default = []
