@@ -21,7 +21,7 @@
     },
     "scripts": {
         "lint": "cargo fmt --check && prettier */*.js \"*/**/*{.js,.ts}\" --check",
-        "format": "cargo fmt && prettier */*.js \"*/**/*{.js,.ts}\" -w",
+        "format": "cargo fmt && prettier . -w",
         "lint:commit-message": "commitlint -e",
         "prepare": "husky",
         "build": "node ./build.js",
