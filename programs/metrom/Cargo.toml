@@ -1,5 +1,5 @@
 [package]
-name = "metrom"
+name = "metrom_solana"
 version = "0.1.0"
 description = "Solana programs for Metrom"
 edition = "2021"
