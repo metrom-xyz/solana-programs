@@ -1,4 +1,4 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
@@ -8,7 +8,6 @@ import {
     createAssociatedTokenAccount,
     createMint,
 } from "./support/fixtures";
-import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 import {
     getAccount,
@@ -44,7 +43,7 @@ describe("Claim fees", () => {
             rewardAmount: 1_000_000,
         });
 
-        const signer = Keypair.generate();
+        const signer = web3.Keypair.generate();
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -90,7 +89,7 @@ describe("Claim fees", () => {
             rewardAmount: 1_000_000,
         });
 
-        const signer = Keypair.generate();
+        const signer = web3.Keypair.generate();
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -105,7 +104,7 @@ describe("Claim fees", () => {
         await program.methods
             .claimFee()
             .accounts({
-                mint: Keypair.generate().publicKey,
+                mint: web3.Keypair.generate().publicKey,
                 receiverTokenAccount,
                 signer: signer.publicKey,
             })
@@ -151,7 +150,7 @@ describe("Claim fees", () => {
         const feeAmount = (rewardAmount * fee) / 1_000_000;
 
         const claimableFee = await program.account.claimableFee.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("claimable_fee"), mint.publicKey.toBuffer()],
                 program.programId
             )[0]
@@ -178,7 +177,7 @@ describe("Claim fees", () => {
             .rpc();
 
         const claimableFeePost = await program.account.claimableFee.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("claimable_fee"), mint.publicKey.toBuffer()],
                 program.programId
             )[0]

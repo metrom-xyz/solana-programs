@@ -1,4 +1,4 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
@@ -6,7 +6,6 @@ import {
     fundAccount,
     setFee,
 } from "./support/fixtures";
-import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 
 describe("Set fee", () => {
@@ -40,7 +39,7 @@ describe("Set fee", () => {
             maximumCampaignDuration: 20,
         });
 
-        const signer = Keypair.generate();
+        const signer = web3.Keypair.generate();
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -69,7 +68,7 @@ describe("Set fee", () => {
         await setFee({ program, fee: 500_000 });
 
         const state = await program.account.state.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("state")],
                 program.programId
             )[0]

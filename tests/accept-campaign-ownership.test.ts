@@ -1,4 +1,4 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
@@ -7,7 +7,6 @@ import {
     createRewardsCampaign,
     createMint,
 } from "./support/fixtures";
-import { Keypair } from "@solana/web3.js";
 import { expect } from "chai";
 
 describe("Accept campaign ownership", () => {
@@ -29,7 +28,7 @@ describe("Accept campaign ownership", () => {
         await program.methods
             .acceptCampaignOwnership()
             .accounts({
-                campaign: Keypair.generate().publicKey,
+                campaign: web3.Keypair.generate().publicKey,
             })
             .rpc().should.eventually.be.rejected;
     });
@@ -67,7 +66,7 @@ describe("Accept campaign ownership", () => {
             rewardAmount,
         });
 
-        const signer = Keypair.generate();
+        const signer = web3.Keypair.generate();
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -75,7 +74,7 @@ describe("Accept campaign ownership", () => {
         });
 
         await program.methods
-            .transferCampaignOwnership(Keypair.generate().publicKey)
+            .transferCampaignOwnership(web3.Keypair.generate().publicKey)
             .accounts({ campaign: campaign.id })
             .rpc();
 
@@ -119,7 +118,7 @@ describe("Accept campaign ownership", () => {
             rewardAmount,
         });
 
-        const newOwner = Keypair.generate();
+        const newOwner = web3.Keypair.generate();
         await fundAccount({
             program,
             account: newOwner.publicKey,

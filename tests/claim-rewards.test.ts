@@ -1,4 +1,4 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
@@ -16,7 +16,6 @@ import {
 } from "@solana/spl-token";
 import { BN } from "bn.js";
 import { hexTo32Array } from "./support/utils";
-import { Keypair, PublicKey } from "@solana/web3.js";
 
 describe("Claim rewards", () => {
     let program: Program<Metrom>;
@@ -177,7 +176,9 @@ describe("Claim rewards", () => {
             mint,
         });
 
-        const signer = Keypair.fromSeed(Uint8Array.from(new Array(32).fill(1)));
+        const signer = web3.Keypair.fromSeed(
+            Uint8Array.from(new Array(32).fill(1))
+        );
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -266,7 +267,9 @@ describe("Claim rewards", () => {
             mint,
         });
 
-        const signer = Keypair.fromSeed(Uint8Array.from(new Array(32).fill(1)));
+        const signer = web3.Keypair.fromSeed(
+            Uint8Array.from(new Array(32).fill(1))
+        );
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -372,7 +375,9 @@ describe("Claim rewards", () => {
             mint,
         });
 
-        const signer = Keypair.fromSeed(Uint8Array.from(new Array(32).fill(1)));
+        const signer = web3.Keypair.fromSeed(
+            Uint8Array.from(new Array(32).fill(1))
+        );
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -438,7 +443,7 @@ describe("Claim rewards", () => {
         );
 
         const claimedReward = await program.account.claimedReward.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [
                     Buffer.from("claimed_reward"),
                     signer.publicKey.toBuffer(),

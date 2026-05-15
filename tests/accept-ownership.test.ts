@@ -1,11 +1,10 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
     initializeTestState,
     fundAccount,
 } from "./support/fixtures";
-import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 
 describe("Accept ownership", () => {
@@ -24,7 +23,7 @@ describe("Accept ownership", () => {
             maximumCampaignDuration: 20,
         });
 
-        const signer = Keypair.generate();
+        const signer = web3.Keypair.generate();
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -50,7 +49,7 @@ describe("Accept ownership", () => {
             maximumCampaignDuration: 20,
         });
 
-        const newOwner = Keypair.generate();
+        const newOwner = web3.Keypair.generate();
         await fundAccount({
             program,
             account: newOwner.publicKey,
@@ -65,7 +64,7 @@ describe("Accept ownership", () => {
             .rpc();
 
         const state = await program.account.state.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("state")],
                 program.programId
             )[0]

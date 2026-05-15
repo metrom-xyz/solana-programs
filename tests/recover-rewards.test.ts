@@ -4,19 +4,12 @@ import {
     initializeMetrom,
     initializeTestState,
     createRewardsCampaign,
-    createMint,
-    fundAccount,
-    createAssociatedTokenAccount,
 } from "./support/fixtures";
-import { expect } from "chai";
 import {
-    getAccount,
     getAssociatedTokenAddressSync,
     TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { BN } from "bn.js";
-import { hexTo32Array } from "./support/utils";
-import { Keypair, PublicKey } from "@solana/web3.js";
 
 describe("Recover rewards", () => {
     let program: Program<Metrom>;

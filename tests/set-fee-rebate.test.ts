@@ -1,4 +1,4 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
@@ -6,7 +6,6 @@ import {
     setFeeRebate,
     fundAccount,
 } from "./support/fixtures";
-import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 
 describe("Set fee rebate", () => {
@@ -41,7 +40,7 @@ describe("Set fee rebate", () => {
             maximumCampaignDuration: 20,
         });
 
-        const signer = Keypair.generate();
+        const signer = web3.Keypair.generate();
         await fundAccount({
             program,
             account: signer.publicKey,
@@ -49,7 +48,7 @@ describe("Set fee rebate", () => {
         });
 
         await program.methods
-            .setFeeRebate(Keypair.generate().publicKey, 500_000)
+            .setFeeRebate(web3.Keypair.generate().publicKey, 500_000)
             .accounts({
                 signer: signer.publicKey,
             })
@@ -74,7 +73,7 @@ describe("Set fee rebate", () => {
         });
 
         const feeRebate = await program.account.feeRebate.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [
                     Buffer.from("fee_rebate"),
                     program.provider.wallet.publicKey.toBuffer(),

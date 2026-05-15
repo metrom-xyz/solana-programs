@@ -1,6 +1,5 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { PublicKey } from "@solana/web3.js";
 import { Metrom } from "../../target/types/metrom";
 import IDL from "../../target/idl/metrom.json";
 import { Program, web3, setProvider, BN } from "@coral-xyz/anchor";
@@ -13,7 +12,6 @@ import {
     MINT_SIZE,
     TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { SystemProgram, Keypair, Transaction } from "@solana/web3.js";
 import { toLe32, toLe64 } from "./utils";
 
 chai.should();
@@ -30,7 +28,7 @@ export async function initializeTestState(): Promise<Program<Metrom>> {
 
 interface FundAccountArgs {
     program: Program<Metrom>;
-    account: PublicKey;
+    account: web3.PublicKey;
     amount: number;
 }
 
@@ -40,8 +38,8 @@ export async function fundAccount({
     amount,
 }: FundAccountArgs): Promise<void> {
     await program.provider.sendAndConfirm(
-        new Transaction().add(
-            SystemProgram.transfer({
+        new web3.Transaction().add(
+            web3.SystemProgram.transfer({
                 fromPubkey: program.provider.wallet.publicKey,
                 toPubkey: account,
                 lamports: amount,
@@ -52,7 +50,7 @@ export async function fundAccount({
 
 interface InitializeMetromArgs {
     program: Program<Metrom>;
-    updater: PublicKey;
+    updater: web3.PublicKey;
     fee: number;
     minimumCampaignDuration: number;
     maximumCampaignDuration: number;
@@ -77,7 +75,7 @@ export async function initializeMetrom({
 
 interface SetFeeRebateArgs {
     program: Program<Metrom>;
-    account: PublicKey;
+    account: web3.PublicKey;
     rebate: number;
 }
 
@@ -129,22 +127,22 @@ interface CreateRewardsCampaignArgs {
     kind: number;
     data: Buffer<ArrayBufferLike>;
     specificationHash: number[];
-    mint?: Keypair;
+    mint?: web3.Keypair;
     rewardAmount: number;
     minimumRewardTokenRate?: number;
 }
 
 interface RewardsCampaign {
-    id: PublicKey;
-    owner: PublicKey;
-    pendingOwner: PublicKey | null;
+    id: web3.PublicKey;
+    owner: web3.PublicKey;
+    pendingOwner: web3.PublicKey | null;
     from: BN;
     duration: BN;
     kind: number;
     data: Buffer;
     specificationHash: number[] | null;
     root: number[];
-    mint: PublicKey;
+    mint: web3.PublicKey;
     rewardAmount: BN;
 }
 
@@ -204,7 +202,7 @@ export async function createRewardsCampaign({
         })
         .rpc();
 
-    const campaignId = PublicKey.findProgramAddressSync(
+    const campaignId = web3.PublicKey.findProgramAddressSync(
         [
             Buffer.from("campaign"),
             program.provider.wallet.publicKey.toBuffer(),
@@ -243,15 +241,15 @@ interface CreatePointsCampaignArgs {
     kind: number;
     data: Buffer<ArrayBufferLike>;
     specificationHash: number[];
-    mint?: Keypair;
+    mint?: web3.Keypair;
     points: number;
     minimumFeeTokenRate?: number;
 }
 
 interface PointsCampaign {
-    id: PublicKey;
-    owner: PublicKey;
-    pendingOwner: PublicKey | null;
+    id: web3.PublicKey;
+    owner: web3.PublicKey;
+    pendingOwner: web3.PublicKey | null;
     from: BN;
     duration: BN;
     kind: number;
@@ -315,7 +313,7 @@ export async function createPointsCampaign({
         })
         .rpc();
 
-    const campaignId = PublicKey.findProgramAddressSync(
+    const campaignId = web3.PublicKey.findProgramAddressSync(
         [
             Buffer.from("campaign"),
             program.provider.wallet.publicKey.toBuffer(),
@@ -355,18 +353,18 @@ export async function createMint({
     program,
     decimals,
     keyPairSeed,
-}: CreateMintArgs): Promise<Keypair> {
+}: CreateMintArgs): Promise<web3.Keypair> {
     const mint = keyPairSeed
-        ? Keypair.fromSeed(keyPairSeed)
-        : Keypair.generate();
+        ? web3.Keypair.fromSeed(keyPairSeed)
+        : web3.Keypair.generate();
 
     const lamports =
         await program.provider.connection.getMinimumBalanceForRentExemption(
             MINT_SIZE
         );
 
-    const tx = new Transaction().add(
-        SystemProgram.createAccount({
+    const tx = new web3.Transaction().add(
+        web3.SystemProgram.createAccount({
             fromPubkey: program.provider.wallet.publicKey,
             newAccountPubkey: mint.publicKey,
             space: MINT_SIZE,
@@ -388,19 +386,19 @@ export async function createMint({
 
 interface CreateAssociatedTokenAccountArgs {
     program: Program<Metrom>;
-    mint: PublicKey;
-    owner: PublicKey;
+    mint: web3.PublicKey;
+    owner: web3.PublicKey;
 }
 
 export async function createAssociatedTokenAccount({
     program,
     mint,
     owner,
-}: CreateAssociatedTokenAccountArgs): Promise<PublicKey> {
+}: CreateAssociatedTokenAccountArgs): Promise<web3.PublicKey> {
     const associatedTokenAccount = getAssociatedTokenAddressSync(mint, owner);
 
     await program.provider.sendAndConfirm(
-        new Transaction().add(
+        new web3.Transaction().add(
             createAssociatedTokenAccountInstruction(
                 program.provider.wallet.publicKey,
                 associatedTokenAccount,
@@ -415,9 +413,9 @@ export async function createAssociatedTokenAccount({
 
 interface MintToArgs {
     program: Program<Metrom>;
-    mint: Keypair;
+    mint: web3.Keypair;
     amount: number;
-    to: PublicKey;
+    to: web3.PublicKey;
 }
 
 export async function mintTo({
@@ -425,9 +423,9 @@ export async function mintTo({
     mint,
     amount,
     to,
-}: MintToArgs): Promise<Keypair> {
+}: MintToArgs): Promise<web3.Keypair> {
     await program.provider.sendAndConfirm(
-        new Transaction().add(
+        new web3.Transaction().add(
             createMintToInstruction(
                 mint.publicKey,
                 to,

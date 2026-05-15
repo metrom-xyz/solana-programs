@@ -1,5 +1,4 @@
 import { Program, web3 } from "@coral-xyz/anchor";
-import { Keypair, PublicKey } from "@solana/web3.js";
 import { Metrom } from "../target/types/metrom";
 import { expect } from "chai";
 import { initializeMetrom, initializeTestState } from "./support/fixtures";
@@ -32,7 +31,7 @@ describe("Initialize", () => {
     });
 
     it("Does not allow reinitialization", async () => {
-        const updater = Keypair.generate();
+        const updater = web3.Keypair.generate();
 
         await initializeMetrom({
             program,
@@ -43,7 +42,7 @@ describe("Initialize", () => {
         });
 
         const state = await program.account.state.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("state")],
                 program.programId
             )[0]

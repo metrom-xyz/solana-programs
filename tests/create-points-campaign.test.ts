@@ -1,4 +1,4 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     createPointsCampaign,
@@ -7,7 +7,6 @@ import {
     createMint,
     setFeeRebate,
 } from "./support/fixtures";
-import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 import { getAccount } from "@solana/spl-token";
 
@@ -100,7 +99,7 @@ describe("Create points campaign", () => {
             kind: 1,
             data: Buffer.from([]),
             specificationHash: new Array(32).fill(0),
-            mint: Keypair.generate(),
+            mint: web3.Keypair.generate(),
             points: 1_000_000,
         }).should.eventually.be.rejected;
     });
@@ -202,7 +201,7 @@ describe("Create points campaign", () => {
 
         const programTokenAccount = await getAccount(
             program.provider.connection,
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [
                     Buffer.from("treasury_token_account"),
                     mint.publicKey.toBuffer(),
@@ -215,7 +214,7 @@ describe("Create points campaign", () => {
         );
 
         const claimableFee = await program.account.claimableFee.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("claimable_fee"), mint.publicKey.toBuffer()],
                 program.programId
             )[0]
@@ -283,7 +282,7 @@ describe("Create points campaign", () => {
 
         const programTokenAccount = await getAccount(
             program.provider.connection,
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [
                     Buffer.from("treasury_token_account"),
                     mint.publicKey.toBuffer(),
@@ -296,7 +295,7 @@ describe("Create points campaign", () => {
         );
 
         const claimableFee = await program.account.claimableFee.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("claimable_fee"), mint.publicKey.toBuffer()],
                 program.programId
             )[0]
@@ -360,7 +359,7 @@ describe("Create points campaign", () => {
 
         const programTokenAccount = await getAccount(
             program.provider.connection,
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [
                     Buffer.from("treasury_token_account"),
                     mint.publicKey.toBuffer(),
@@ -371,7 +370,7 @@ describe("Create points campaign", () => {
         expect(programTokenAccount.amount).to.be.deep.equal(BigInt(0));
 
         const claimableFee = await program.account.claimableFee.fetch(
-            PublicKey.findProgramAddressSync(
+            web3.PublicKey.findProgramAddressSync(
                 [Buffer.from("claimable_fee"), mint.publicKey.toBuffer()],
                 program.programId
             )[0]

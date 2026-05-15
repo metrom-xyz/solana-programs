@@ -1,11 +1,10 @@
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import { Metrom } from "../target/types/metrom";
 import {
     initializeMetrom,
     initializeTestState,
     createRewardsCampaign,
 } from "./support/fixtures";
-import { Keypair } from "@solana/web3.js";
 import { expect } from "chai";
 
 describe("Distribute rewards", () => {
@@ -106,7 +105,7 @@ describe("Distribute rewards", () => {
         await program.methods
             .distributeRewards(root, new Array(32).fill(0) as number[])
             .accounts({
-                campaign: Keypair.generate().publicKey,
+                campaign: web3.Keypair.generate().publicKey,
             })
             .rpc().should.eventually.be.rejected;
     });
