@@ -1,7 +1,7 @@
 {
     "type": "module",
     "name": "@metrom-xyz/programs-solana",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Smart programs for Metrom.",
     "author": "Federico Luzzi <federico.luzzi@metrom.xyz>",
     "license": "GPL-3.0-or-later",
