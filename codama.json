@@ -1,0 +1,10 @@
+{
+    "idl": "target/idl/metrom.json",
+    "before": [],
+    "scripts": {
+        "js": {
+            "from": "@codama/renderers-js",
+            "args": ["gen/client"]
+        }
+    }
+}

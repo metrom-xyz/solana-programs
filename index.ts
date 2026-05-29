@@ -7,3 +7,5 @@ export enum SupportedChain {
 export const PROGRAM_ID: web3.PublicKey = new web3.PublicKey(
     "CjVurumkimPq7vubn7zDtgZUoeNzF8ZF3oo8zJzcWykx"
 );
+
+export * from "./gen/client/src/generated/index";

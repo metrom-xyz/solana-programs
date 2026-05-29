@@ -46,6 +46,9 @@ if (existsSync(join(CURRENT_DIR, "./dist"))) {
     rmSync(join(CURRENT_DIR, "./dist"), { recursive: true });
 }
 
+console.log("Generating JS Codama client...");
+execSync("pnpm codama run js", { stdio: "inherit" });
+
 console.log("Building library...");
 execSync("pnpm tsc --project tsconfig.lib.json", { stdio: "inherit" });
 

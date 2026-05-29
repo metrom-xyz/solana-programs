@@ -11,7 +11,8 @@
     "exports": {
         ".": "./dist/index.js",
         "./idls/Metrom.json": "./dist/idls/Metrom.json",
-        "./idl": "./dist/gen/idl.js"
+        "./idl": "./dist/gen/idl.js",
+        "./client": "./dist/gen/client/src/generated/index.js"
     },
     "files": [
         "./dist"
@@ -27,7 +28,16 @@
         "build": "node ./build.js",
         "prepublishOnly": "pnpm build"
     },
+    "peerDependencies": {
+        "@solana/kit": "^6.4.0"
+    },
+    "dependencies": {
+        "@solana/program-client-core": "^6.4.0"
+    },
     "devDependencies": {
+        "@codama/cli": "^1.5.1",
+        "@codama/nodes-from-anchor": "^1.4.1",
+        "@codama/renderers-js": "^2.2.0",
         "@commitlint/cli": "^19.5.0",
         "@commitlint/config-conventional": "^19.5.0",
         "@coral-xyz/anchor": "^0.32.1",
