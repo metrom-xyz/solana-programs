@@ -100,7 +100,7 @@ mod metrom {
     }
 
     pub fn recover_reward(
-        ctx: Context<ClaimReward>,
+        ctx: Context<RecoverReward>,
         proof: Vec<[u8; 32]>,
         amount: u64,
     ) -> Result<()> {

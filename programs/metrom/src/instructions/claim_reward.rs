@@ -26,7 +26,21 @@ pub fn handle_claim_reward(
     let mint = ctx.accounts.mint.key();
     let receiver = ctx.accounts.receiver_token_account.key();
 
-    process_claim(ctx, proof, amount, false)?;
+    let accounts = ctx.accounts;
+    process_claim(
+        &accounts.signer,
+        &accounts.state,
+        ctx.bumps.state,
+        &mut accounts.campaign,
+        &mut accounts.user_claimed_reward,
+        &accounts.mint,
+        &accounts.treasury_token_account,
+        &accounts.receiver_token_account,
+        &accounts.token_program,
+        proof,
+        amount,
+        false,
+    )?;
 
     emit!(ClaimRewardEvent {
         campaign_id,
@@ -47,7 +61,7 @@ struct RecoverRewardEvent {
 }
 
 pub fn handle_recover_reward(
-    ctx: Context<ClaimReward>,
+    ctx: Context<RecoverReward>,
     proof: Vec<[u8; 32]>,
     amount: u64,
 ) -> Result<()> {
@@ -55,7 +69,21 @@ pub fn handle_recover_reward(
     let mint = ctx.accounts.mint.key();
     let receiver = ctx.accounts.receiver_token_account.key();
 
-    process_claim(ctx, proof, amount, true)?;
+    let accounts = ctx.accounts;
+    process_claim(
+        &accounts.signer,
+        &accounts.state,
+        ctx.bumps.state,
+        &mut accounts.campaign,
+        &mut accounts.user_reimbursed_reward,
+        &accounts.mint,
+        &accounts.treasury_token_account,
+        &accounts.receiver_token_account,
+        &accounts.token_program,
+        proof,
+        amount,
+        true,
+    )?;
 
     emit!(RecoverRewardEvent {
         campaign_id,
@@ -109,25 +137,75 @@ pub struct ClaimReward<'info> {
     pub system_program: Program<'info, System>,
 }
 
-fn process_claim(
-    ctx: Context<ClaimReward>,
+#[derive(Accounts)]
+pub struct RecoverReward<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+    #[account(mut, seeds = [b"state"], bump)]
+    pub state: Account<'info, State>,
+    #[account(mut)]
+    pub campaign: Account<'info, Campaign>,
+    #[account(
+        init_if_needed,
+        space = 8 + ClaimedReward::INIT_SPACE,
+        payer = signer,
+        seeds = [
+            b"reimbursed_reward",
+            signer.key().as_ref(),
+            campaign.key().as_ref()
+        ],
+        bump
+    )]
+    pub user_reimbursed_reward: Account<'info, ClaimedReward>,
+    #[account(mut)]
+    pub mint: InterfaceAccount<'info, Mint>,
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = state,
+        token::token_program = token_program,
+        seeds = [b"treasury_token_account", mint.key().as_ref()],
+        bump
+    )]
+    pub treasury_token_account: InterfaceAccount<'info, TokenAccount>,
+    #[account(
+        mut,
+        token::mint = mint,
+        token::authority = signer,
+        token::token_program = token_program,
+    )]
+    pub receiver_token_account: InterfaceAccount<'info, TokenAccount>,
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
+}
+
+fn process_claim<'info>(
+    signer: &Signer<'info>,
+    state: &Account<'info, State>,
+    state_bump: u8,
+    campaign: &mut Account<'info, Campaign>,
+    user_claimed_reward: &mut Account<'info, ClaimedReward>,
+    mint: &InterfaceAccount<'info, Mint>,
+    treasury_token_account: &InterfaceAccount<'info, TokenAccount>,
+    receiver_token_account: &InterfaceAccount<'info, TokenAccount>,
+    token_program: &Interface<'info, TokenInterface>,
     proof: Vec<[u8; 32]>,
     amount: u64,
     recovering: bool,
 ) -> Result<()> {
     require!(amount > 0, Error::NoRewardAmount);
 
-    let signer_key = ctx.accounts.signer.key();
-    let campaign_owner = ctx.accounts.campaign.base.owner;
+    let signer_key = signer.key();
+    let campaign_owner = campaign.base.owner;
 
-    let rewards_campaign_data = match ctx.accounts.campaign.data {
+    let rewards_campaign_data = match campaign.data {
         CampaignData::Rewards(ref mut data) => data,
         CampaignData::Points(_) => return err!(Error::InvalidCampaignType),
     };
 
     require!(rewards_campaign_data.root.is_some(), Error::NoRoot);
     require!(
-        rewards_campaign_data.mint == ctx.accounts.mint.key(),
+        rewards_campaign_data.mint == mint.key(),
         Error::NonExistentReward
     );
     if recovering {
@@ -139,35 +217,35 @@ fn process_claim(
             rewards_campaign_data.root.unwrap(),
             proof,
             if recovering { Pubkey::NONE } else { signer_key },
-            ctx.accounts.mint.key(),
+            mint.key(),
             amount
         ),
         Error::InvalidProof
     );
 
-    let claimed_amount = amount - ctx.accounts.user_claimed_reward.claimed;
+    let claimed_amount = amount - user_claimed_reward.claimed;
     require!(claimed_amount > 0, Error::NoRewardAmount);
     require!(
         claimed_amount <= rewards_campaign_data.amount,
         Error::InconsistentClaimedRewardAmount
     );
 
-    ctx.accounts.user_claimed_reward.claimed += claimed_amount;
+    user_claimed_reward.claimed += claimed_amount;
     rewards_campaign_data.amount -= claimed_amount;
 
-    let signer_seeds: &[&[&[u8]]] = &[&[b"state", &[ctx.bumps.state]]];
+    let signer_seeds: &[&[&[u8]]] = &[&[b"state", &[state_bump]]];
 
     let cpi_context = CpiContext::new(
-        ctx.accounts.token_program.to_account_info(),
+        token_program.to_account_info(),
         TransferChecked {
-            from: ctx.accounts.treasury_token_account.to_account_info(),
-            to: ctx.accounts.receiver_token_account.to_account_info(),
-            authority: ctx.accounts.state.to_account_info(),
-            mint: ctx.accounts.mint.to_account_info(),
+            from: treasury_token_account.to_account_info(),
+            to: receiver_token_account.to_account_info(),
+            authority: state.to_account_info(),
+            mint: mint.to_account_info(),
         },
     )
     .with_signer(signer_seeds);
-    token_interface::transfer_checked(cpi_context, claimed_amount, ctx.accounts.mint.decimals)?;
+    token_interface::transfer_checked(cpi_context, claimed_amount, mint.decimals)?;
 
     Ok(())
 }
