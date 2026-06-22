@@ -27,7 +27,7 @@ pub fn handle_claim_reward(
     let receiver = ctx.accounts.receiver_token_account.key();
 
     let accounts = ctx.accounts;
-    process_claim(
+    let claimed_amount = process_claim(
         &accounts.signer,
         &accounts.state,
         ctx.bumps.state,
@@ -45,7 +45,7 @@ pub fn handle_claim_reward(
     emit!(ClaimRewardEvent {
         campaign_id,
         mint,
-        amount: amount,
+        amount: claimed_amount,
         receiver
     });
 
@@ -70,7 +70,7 @@ pub fn handle_recover_reward(
     let receiver = ctx.accounts.receiver_token_account.key();
 
     let accounts = ctx.accounts;
-    process_claim(
+    let claimed_amount = process_claim(
         &accounts.signer,
         &accounts.state,
         ctx.bumps.state,
@@ -88,7 +88,7 @@ pub fn handle_recover_reward(
     emit!(RecoverRewardEvent {
         campaign_id,
         mint,
-        amount: amount,
+        amount: claimed_amount,
         receiver
     });
 
@@ -192,7 +192,7 @@ fn process_claim<'info>(
     proof: Vec<[u8; 32]>,
     amount: u64,
     recovering: bool,
-) -> Result<()> {
+) -> Result<u64> {
     require!(amount > 0, Error::NoRewardAmount);
 
     let signer_key = signer.key();
@@ -247,7 +247,7 @@ fn process_claim<'info>(
     .with_signer(signer_seeds);
     token_interface::transfer_checked(cpi_context, claimed_amount, mint.decimals)?;
 
-    Ok(())
+    Ok(claimed_amount)
 }
 
 fn verify_merkle_proof(
